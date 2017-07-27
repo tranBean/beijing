@@ -26,22 +26,21 @@ public class MainActivity extends AppCompatActivity {
 
         StringBuffer sb = new StringBuffer();
         List list = new ArrayList<Integer>();
-        TextView textView = (TextView)findViewById(R.id.text);
-        for (int i=0;i < string.length() ;i++)
-        {
-            if(string.charAt(i) == '('){
+        TextView textView = (TextView) findViewById(R.id.text);
+        for (int i = 0; i < string.length(); i++) {
+            if (string.charAt(i) == '(') {
                 x = i;
             }
-            if(string.charAt(i) == ')'){
+            if (string.charAt(i) == ')') {
                 y = i;
             }
         }
-            SpannableStringBuilder style = new SpannableStringBuilder(string);
-        style.setSpan(new AbsoluteSizeSpan(28), x, y+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        SpannableStringBuilder style = new SpannableStringBuilder(string);
+        style.setSpan(new AbsoluteSizeSpan(28), x, y + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         //for (int i = 0; i < list.size(); i++) {
-            //System.out.println(list.get(i)+", ");
+        //System.out.println(list.get(i)+", ");
 //      style.setSpan(new BackgroundColorSpan(Color.RED),list.get(i),list.get(i)+1,Spannable.SPAN_EXCLUSIVE_INCLUSIVE);   //设置指定位置textview的背景颜色
-           style.setSpan(new ForegroundColorSpan(Color.RED), x,y+1, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);   //设置指定位置文字的颜色
+        style.setSpan(new ForegroundColorSpan(Color.RED), x, y + 1, Spannable.SPAN_EXCLUSIVE_INCLUSIVE);   //设置指定位置文字的颜色
         //}
         textView.setText(style);
 
