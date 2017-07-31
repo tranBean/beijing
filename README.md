@@ -62,4 +62,4 @@ public class MainActivity extends AppCompatActivity {
 ニュースウィジェットが現行4*1のサイズですが、4*2のサイズになります。
 サイズ変更が問題ないか検証をお願いします。
 （とりあえずニュースウィジェットを4*2サイズにして確認。中身は適当でOK）
-
+http://blog.csdn.net/harvic880925/article/details/41553177
