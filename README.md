@@ -47,19 +47,12 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-
-
-
-
- 07/28 10:20 From  久保健太郎  
-
-
-
-
-
-
-調査をお願いします。
-ニュースウィジェットが現行4*1のサイズですが、4*2のサイズになります。
-サイズ変更が問題ないか検証をお願いします。
-（とりあえずニュースウィジェットを4*2サイズにして確認。中身は適当でOK）
 http://blog.csdn.net/harvic880925/article/details/41553177
+
+
+                dm = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(dm);
+                //获得手机的宽带和高度像素单位为px
+                String str = "手机屏幕分辨率为:" + dm.widthPixels
+                        +" * "+dm.heightPixels;
+                textview1.setText(str);
