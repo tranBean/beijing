@@ -56,3 +56,7 @@ http://blog.csdn.net/harvic880925/article/details/41553177
                 String str = "手机屏幕分辨率为:" + dm.widthPixels
                         +" * "+dm.heightPixels;
                 textview1.setText(str);
+                
+                
+                
+                http://blog.csdn.net/harvic880925/article/details/51523983
