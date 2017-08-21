@@ -60,3 +60,11 @@ http://blog.csdn.net/harvic880925/article/details/41553177
                 
                 
                 http://blog.csdn.net/harvic880925/article/details/51523983
+                
+ ドライバ 更新
+Android Composite ADB Interfaceを認識し、ドライバのインストール画面が起動します。
+※ドライバのインストール画面が起動しない場合、以下の操作をお試し下さい。
+1. PCのコントロールパネル を開き、一覧から デバイスマネージャー を開きます。
+2. [ほかのデバイス] - [Android ADB Interface] を右クリックし、[ドライバソフトウェアの更新] を選択します。
+3. [コンピューターを参照してドライバソフトウェアを検索します] を選択します。
+ドライバ格納先で"\usb_driver_SHARP"を選択し、ドライバをインストールします。
