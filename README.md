@@ -68,3 +68,7 @@ Android Composite ADB Interfaceを認識し、ドライバのインストール�
 2. [ほかのデバイス] - [Android ADB Interface] を右クリックし、[ドライバソフトウェアの更新] を選択します。
 3. [コンピューターを参照してドライバソフトウェアを検索します] を選択します。
 ドライバ格納先で"\usb_driver_SHARP"を選択し、ドライバをインストールします。
+
+adb shell setprop log.tag.AppIndexApi VERBOSE
+adb logcat -v time -s AppIndexApi:V
+
