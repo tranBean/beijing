@@ -84,3 +84,38 @@ adb logcat -v time -s AppIndexApi:V
 10秒戻し
 再生/一時停止
 30秒送り
+
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        VideoView videoView = (VideoView) this.findViewById(R.id.vv_video);
+
+        videoView.setVideoURI(Uri.parse("http://192.168.128.190:8080/carlock.mp4"));
+
+        MediaController ctr = new MediaController(this);
+
+        videoView.setMediaController(ctr);
+
+        ctr.setMediaPlayer(videoView);
+    }
+    
+    <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <VideoView
+        android:id="@+id/vv_video"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>
+
