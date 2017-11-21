@@ -119,3 +119,422 @@ public class MainActivity extends AppCompatActivity {
 
 </RelativeLayout>
 
+
+---1121
+package com.awesome.tranbean.videodemomooc;
+
+import android.content.res.Configuration;
+import android.media.AudioManager;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.MediaController;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.VideoView;
+
+public class MainActivity extends FragmentActivity {
+
+    private static final int UPDATE_UI = 0;
+    private VideoView mVideoView;
+    private View ctrlBar;
+    private SeekBar progressSeekBar;
+    private ImageView playCtrl;
+    private TextView curtime;
+    private TextView tottime;
+    private ImageView fullScreen;
+    private SeekBar audioSb;
+    private ImageView audio;
+    private int screentW;
+    private int screentH;
+    private RelativeLayout videoLayout;
+    private AudioManager mAudioManager;
+
+    private boolean isAdjust = false;
+    private int threshold = 54;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        initView();
+        mVideoView = findViewById(R.id.main_vv);
+
+        //mVideoView.setVideoPath("");
+
+        mVideoView.setVideoURI(Uri.parse("http://192.168.128.190:8080/carlock.mp4"));
+
+        MediaController meCtrl = new MediaController(this);
+        mVideoView.setMediaController(meCtrl);
+        meCtrl.setMediaPlayer(mVideoView);
+
+        setPlayerEvent();
+
+        mVideoView.start();
+        UIHandler.sendEmptyMessage(UPDATE_UI);
+
+
+    }
+
+    private void updateTextViewWithTimeFormat(TextView tv, int millsec) {
+        int second = millsec / 1000;
+        int hh = second / 3600;
+        int mm = second % 3600 / 60;
+        int ss = second % 60;
+
+        String str = null;
+        if (hh != 0) {
+            //至少两位10位数整数
+            str = String.format("%02d:%02d:%02d", hh, mm, ss);
+        } else {
+            str = String.format("%02d:%02d", mm, ss);
+        }
+        tv.setText(str);
+    }
+
+
+    private Handler UIHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what == UPDATE_UI) {
+
+                int currentPosition = mVideoView.getCurrentPosition();
+                int totalduration = mVideoView.getDuration();
+
+                //
+                updateTextViewWithTimeFormat(curtime, currentPosition);
+                updateTextViewWithTimeFormat(tottime, totalduration);
+                //
+                progressSeekBar.setMax(totalduration);
+                progressSeekBar.setProgress(currentPosition);
+
+                //
+                UIHandler.sendEmptyMessageDelayed(UPDATE_UI, 500);
+            }
+
+
+        }
+    };
+
+    private void setPlayerEvent() {
+        playCtrl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mVideoView.isPlaying()) {
+                    //playCtrl.setImageResource(R.drawable.play_btn_style);
+                    //
+                    mVideoView.pause();
+                    //停止有爱刷新
+                    UIHandler.removeMessages(UPDATE_UI);
+                } else {
+
+                    //
+                    mVideoView.start();
+                    //huifu有爱刷新
+                    UIHandler.sendEmptyMessage(UPDATE_UI);
+                }
+            }
+        });
+
+        progressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                updateTextViewWithTimeFormat(curtime, i);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                UIHandler.removeMessages(UPDATE_UI);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                //视频进度到停止拖动到位置
+                mVideoView.seekTo(progress);
+                UIHandler.sendEmptyMessage(UPDATE_UI);
+            }
+        });
+
+        audioSb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, i, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        mVideoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                float x = motionEvent.getX();
+                float y = motionEvent.getY();
+                float lastX = 0;
+                float lastY = 0;
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        lastX = x;
+                        lastY = y;
+                    }
+                    case MotionEvent.ACTION_MOVE: {
+                        float detlaX = x - lastX;
+                        float detlaY = y - lastY;
+                        //偏移量绝对值
+                        float absdetLaX = Math.abs(detlaX);
+                        float absdetLaY = Math.abs(detlaY);
+                        
+                        if(absdetLaX > threshold && absdetLaY> threshold){
+                            if(absdetLaX < absdetLaY){
+                                isAdjust = true;
+                            }else {
+                                isAdjust = false;
+                            }
+                        }else if(absdetLaX<threshold && absdetLaY > threshold){
+                            isAdjust = true;
+                        }else if(absdetLaX>threshold && absdetLaY < threshold){
+                            isAdjust = false;
+                        }
+                        
+                        if(isAdjust){
+                            if (x < screentW /2) {
+                                if(detlaY>0){
+                                    //降低亮度
+                                }
+                            }else {
+                                //身高亮度
+                            }
+                        }else {
+                            //调节声音
+                            if(detlaY>0){
+                                //jianxiao shenying
+                            }else {
+                                //tigao shengyin
+                            }
+                        }
+                        lastX = x;
+                        lastY = y;
+                        break;
+                    }
+                    case MotionEvent.ACTION_UP: {
+
+                    }
+
+                }
+
+                return true;
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //停止有爱刷新
+        UIHandler.removeMessages(UPDATE_UI);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //停止有爱刷新
+        UIHandler.removeMessages(UPDATE_UI);
+
+    }
+
+    private void initView() {
+        ctrlBar = findViewById(R.id.ctrl_bar_ll);
+        progressSeekBar = findViewById(R.id.progress_seek_bar_sb);
+        playCtrl = findViewById(R.id.pause_iv);
+        curtime = findViewById(R.id.time_cur_tv);
+        tottime = findViewById(R.id.time_total_tv);
+        fullScreen = findViewById(R.id.screen_iv);
+        audioSb = findViewById(R.id.audio_seek_bar_sb);
+        audio = findViewById(R.id.audio_icon);
+        videoLayout = findViewById(R.id.video_layout_rl);
+
+        screentW = getResources().getDisplayMetrics().widthPixels;
+        screentH = getResources().getDisplayMetrics().heightPixels;
+
+        int streamMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int curVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        audioSb.setMax(streamMaxVolume);
+        audioSb.setProgress(curVolume);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+            //setViewPlayerScale(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+            //setViewPlayerScale(screentW,screentH);
+            audioSb.setVisibility(View.VISIBLE);
+        } else {
+            //竖到 240 px to dp必要！
+            setViewPlayerScale(ViewGroup.LayoutParams.MATCH_PARENT, 240);
+        }
+    }
+
+    private void setViewPlayerScale(int screentW, int screentH) {
+        ViewGroup.LayoutParams layoutParams = mVideoView.getLayoutParams();
+        layoutParams.height = screentH;
+        layoutParams.width = screentW;
+        mVideoView.setLayoutParams(layoutParams);
+
+        ViewGroup.LayoutParams layoutParams1 = videoLayout.getLayoutParams();
+        layoutParams1.height = screentH;
+        layoutParams1.width = screentW;
+        videoLayout.setLayoutParams(layoutParams1);
+
+    }
+}
+---xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<RelativeLayout
+		android:id="@+id/video_layout_rl"
+		android:layout_width="match_parent"
+		android:layout_height="240dp">
+
+		<VideoView
+			android:id="@+id/main_vv"
+			android:layout_width="match_parent"
+			android:layout_height="240dp"/>
+
+		<LinearLayout
+			android:id="@+id/ctrl_bar_ll"
+			android:layout_width="match_parent"
+			android:layout_height="50dp"
+			android:layout_alignParentBottom="true"
+			android:orientation="vertical">
+
+			<!-- progressDrawable= selector -->
+			<SeekBar
+				android:id="@+id/progress_seek_bar_sb"
+				android:layout_width="match_parent"
+				android:layout_height="5dp"
+				android:layout_marginLeft="-20dp"
+				android:layout_marginRight="-20dp"
+				android:indeterminate="false"
+				android:max="100"
+				android:progress="30"
+				android:progressDrawable="@drawable/seekbar_style2"
+				android:thumb="@null"/>
+
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:background="#101010"
+				android:gravity="center_vertical">
+
+				<LinearLayout
+					android:id="@+id/left_layout"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:gravity="center_vertical"
+					android:orientation="horizontal">
+
+					<ImageView
+						android:id="@+id/pause_iv"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginLeft="16dp"
+						android:src="@android:drawable/ic_menu_info_details"/>
+
+					<TextView
+						android:id="@+id/time_cur_tv"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginLeft="32dp"
+						android:text="00:00:00"
+						android:textColor="@android:color/white"
+						android:textSize="14dp"/>
+
+					<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginLeft="5dp"
+						android:text="/"
+						android:textColor="#4c4c4c"
+						android:textSize="14dp"/>
+
+					<TextView
+						android:id="@+id/time_total_tv"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginLeft="5dp"
+						android:text="00:00:00"
+						android:textColor="@android:color/white"
+						android:textSize="14dp"/>
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="10dp"
+					android:layout_height="match_parent"
+					android:layout_alignParentRight="true"
+					android:layout_toRightOf="@id/left_layout"
+					android:gravity="center"
+					android:orientation="horizontal">
+
+					<ImageView
+						android:id="@+id/audio_icon"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:src="@android:drawable/ic_menu_info_details"
+						/>
+
+					<SeekBar
+						android:id="@+id/audio_seek_bar_sb"
+						android:layout_width="100dp"
+						android:layout_height="5dp"
+						android:indeterminate="false"
+						android:max="100"
+						android:progress="20"
+						android:progressDrawable="@drawable/seekbar_style2"
+						android:thumb="@null"
+						android:visibility="gone"/>
+
+					<View
+						android:layout_width="1dp"
+						android:layout_height="match_parent"
+						android:layout_marginBottom="5dp"
+						android:layout_marginLeft="32dp"
+						android:layout_marginTop="5dp"
+						android:background="#1e1e1e"/>
+
+					<ImageView
+						android:id="@+id/screen_iv"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginLeft="16dp"
+						android:layout_marginRight="16dp"
+						android:src="@android:drawable/ic_menu_info_details"/>
+				</LinearLayout>
+			</RelativeLayout>
+		</LinearLayout>
+	</RelativeLayout>
+
+</RelativeLayout>
+
