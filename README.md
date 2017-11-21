@@ -643,4 +643,26 @@ public class MainActivity extends Activity {
 
 }
 
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item android:id="@android:id/background">
+		<shape>
+			<solid android:color="#707070">
+
+			</solid>
+			<size android:height="5dp"/>
+		</shape>
+	</item>
+
+	<item android:id="@android:id/progress">
+		<clip>
+			<shape>
+				<solid android:color="#B94310"/>
+				<size android:height="5dp"/>
+			</shape>
+		</clip>
+	</item>
+</layer-list>
+
 
