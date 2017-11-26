@@ -666,3 +666,31 @@ public class MainActivity extends Activity {
 </layer-list>
 
 
+
+private Handler mHandler = new Handler(Looper.getMainLooper());
+
+
+mRootView.setOnClickListener(new View.OnClickListener(){
+	@Override
+	public void onClick(View view){
+		//○１
+		if(mBottomLayout.getVisibility() == View.VISIBLE
+			|| mTopLayout.getVisibility == View.VISIBLE}}){
+			mBottomLayout.setVisibility(View.GONE);
+			mTopLayout.setVisibility(View.GONE);
+		}
+		//○２
+		mBottomLayout.setVisibility(View.VISIBLE);
+		mTopLayout.setVisibility(View.VISIBLE);
+		//○3
+		mHandler.postDelayed(new Runable(){
+			@Override
+			public void run() {
+				mBottomLayout.setVisibility(View.GONE);
+				mTopLayout.setVisibility(View.GONE);
+			}
+		} 3000);
+
+
+	}
+});
