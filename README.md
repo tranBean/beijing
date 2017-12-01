@@ -694,3 +694,12 @@ mRootView.setOnClickListener(new View.OnClickListener(){
 
 	}
 });
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+       android:insetLeft="85dp">
+
+	<shape>
+		<solid android:color="#0eAAAAAA"/>
+		<corners android:radius="1dp"/>
+	</shape>
+
+</inset>
